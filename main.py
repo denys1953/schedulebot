@@ -55,16 +55,8 @@ def main():
     @bot.message_handler(content_types=["text"])
     def text(m):
         if m.text == "Почати цикл":
-            def get_info():
-                message = f"{lines}\n{weather_get()}\n{lines}\n{price_get()}\n{lines}"
-                bot.send_message(m.chat.id, message)
-
-            get_info()
-
-            schedule.every().day.at("10:00").do(get_info)
-
-            while True:
-                schedule.run_pending()
+            message = f"{lines}\n{weather_get()}\n{lines}\n{price_get()}\n{lines}"
+            bot.send_message(m.chat.id, message)
 
     bot.polling(none_stop=True, interval=0)
 
