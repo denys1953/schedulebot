@@ -1,0 +1,3 @@
+api_key = "SusM2s1mkWNjaszB5grjdytTFjk3bO5AdCGEbdzqrFht7yDDDgFKOjbbgsl1ceUd"
+api_secret = "B749VHHVkQZ9tCs7UsRY207xqlYZR37WwTnGJx28Wexn6UIl27l7qsudnVeq74cY"
+token = "5118372579:AAG8mnrwgfWnYItTRiQuJUi7HOXYAtZ29e0"
