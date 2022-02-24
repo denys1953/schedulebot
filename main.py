@@ -89,7 +89,7 @@ def main():
                         url = bbc["articles"][k]["url"]
                         bot.send_message(m.chat.id, f"{url}")
                 except Exception as ex:
-                    pass
+                    bot.send_message(m.chat.id, "Результатів не знайдено")
 
 
     bot.polling(none_stop=True, interval=0)
