@@ -3,3 +3,4 @@ requests==2.27.1
 schedule==1.1.0
 translate==3.6.1
 python-binance==1.0.15
+newsapi-python==0.2.6

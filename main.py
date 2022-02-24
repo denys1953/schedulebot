@@ -5,7 +5,8 @@ import telebot
 from telebot import types
 from keys import api_key, api_secret, token
 from binance.client import Client
-from translate import Translator
+from translate import    Translator
+from newsapi import NewsApiClient
 
 client = Client(api_key, api_secret)
 bot = telebot.TeleBot(token)
@@ -79,11 +80,19 @@ def main():
                 price = str(round(float(client.get_avg_price(symbol=crypto_ticker)["price"]), 2)) + "$"
                 bot.send_message(m.chat.id, f"{crypto_ticker}:\n{price}")
             except Exception as ex:
-                pass
+                try:
+                    api_news = NewsApiClient(api_key='5e7365280b4c447c987243e890f80410')
+                    bbc = api_news.get_everything(q=m.text,
+                                                  language="ru",
+                                                  sort_by='relevancy')
+                    for k in range(0, 4):
+                        url = bbc["articles"][k]["url"]
+                        bot.send_message(m.chat.id, f"{url}")
+                except Exception as ex:
+                    pass
 
 
     bot.polling(none_stop=True, interval=0)
 
 if __name__ == '__main__':
     main()
-
