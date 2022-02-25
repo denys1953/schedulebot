@@ -24,7 +24,7 @@ def weather_get():
     weather = translator.translate(str(str(data["list"][0]["weather"][0]["description"])))
     wind_dir = int(data["list"][0]["wind"]["deg"])
     wind_direction = ""
-    if wind_dir >= 337 and wind_dir <= 22:
+    if wind_dir >= 337 and wind_dir <= 360 or wind_dir >= 0 and wind_dir <= 22:
         wind_direction = "ПН"
     elif wind_dir > 22 and wind_dir <= 67:
         wind_direction = "ПН/СХ"
