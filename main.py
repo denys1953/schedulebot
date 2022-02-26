@@ -7,9 +7,21 @@ from keys import api_key, api_secret, token
 from binance.client import Client
 from translate import    Translator
 from newsapi import NewsApiClient
+import random
 
 client = Client(api_key, api_secret)
 bot = telebot.TeleBot(token)
+
+headers = {
+    'X-API-KEY': '9ea3a5fa-bb7d-4f8d-8dc0-5ca352b4931a',
+    'Content-Type': 'application/json',
+}
+
+def get_film():
+    id = random.randint(297, 5000000)
+    url = f"https://kinopoiskapiunofficial.tech/api/v2.2/films/{id}"
+    req = requests.get(url, headers=headers)
+    return json.loads(req.text)
 
 def weather_get():
     api_weather = "http://api.openweathermap.org/data/2.5/find?q=Sambir&type=like&appid=8622086cf3b22b20f915416a1fe01145&units=metric"
@@ -41,18 +53,16 @@ def weather_get():
     elif wind_dir > 292 and wind_dir < 337:
         wind_direction = "ПН/ЗХ"
     string = f"Місто: Самбір\nТемпература: {temp}\nПогода: {weather}\nНапрямок вітру: {wind_direction}\nШвилкість вітру: {wind}"
-    print(data)
     return string
 
 def price_get():
-    url_fiat_course = "https://freecurrencyapi.net/api/v2/latest?apikey=2417fbe0-94e5-11ec-8326-d95b106c0d87"
-    req = requests.get(url_fiat_course).text
+    req = requests.get("https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=5").text
     json_string = json.loads(req)
 
-    price_uah = str(round(float(json_string["data"]["UAH"]), 2))
+    price_uah = str(round(float(json_string[0]["buy"]), 2))
     avg_btc_price = str(round(float(client.get_avg_price(symbol='BTCUSDT')["price"]))) + "$"
 
-    string = f"Курс Доллара: {price_uah}\nКурс Біткоіна: {avg_btc_price}"
+    string = f"Курс доллара: {price_uah}\nКурс Біткоіна: {avg_btc_price}"
     return string
 
 
@@ -64,7 +74,9 @@ def main():
         bot.send_message(m.chat.id, 'Привіт! Тут буде публікуватися актуальна інформація про погоду і курси валют')
         keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
         button_phone = types.KeyboardButton(text="Інформація")
+        button_film = types.KeyboardButton(text="Фільм")
         keyboard.add(button_phone)
+        keyboard.add(button_film)
         bot.send_message(m.chat.id,
                          "Натисніть на кнопку!",
                          reply_markup=keyboard)
@@ -74,6 +86,34 @@ def main():
         if m.text == "Інформація":
             message = f"{lines}\n{weather_get()}\n{lines}\n{price_get()}\n{lines}"
             bot.send_message(m.chat.id, message)
+        elif m.text == "Фільм":
+            i = 0
+            while i == 0:
+                try:
+                    film_info = get_film()
+                    if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6:
+                        if film_info["year"] > 1990:
+                            if film_info["serial"] == False and film_info["shortFilm"] == False and film_info["has3D"] == False:
+                                genres = []
+
+                                for l in range(0, len(film_info["genres"])):
+                                    genres.append(film_info["genres"][l]["genre"])
+                                if "документальный" in genres or "короткометражка" in genres:
+                                    continue
+                                else:
+                                    image_film = film_info["posterUrl"]
+                                    nameRu = film_info["nameRu"]
+                                    rating_kinopoisk = film_info["ratingKinopoisk"]
+                                    year = film_info["year"]
+                                    genre = ",  ".join(genres)
+                                    film_length = str(film_info["filmLength"]) + " хвилин"
+                                    country = film_info["countries"][0]["country"]
+                                    description = film_info["description"]
+                                    main_message_film = f"Фільм: {nameRu}\n\nРік: {year}\nРейтинг: {rating_kinopoisk}\nКраїна: {country}\nЖанр: {genre}\nЧас: {film_length}\nОпис: {description}\n{image_film}"
+                                    bot.send_message(m.chat.id, main_message_film)
+                                    i += 1
+                except Exception as ex:
+                    pass
         else:
             try:
                 crypto_ticker = str(m.text).upper().strip() + "USDT"
