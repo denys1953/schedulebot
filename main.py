@@ -5,9 +5,10 @@ import telebot
 from telebot import types
 from keys import api_key, api_secret, token
 from binance.client import Client
-from translate import    Translator
 from newsapi import NewsApiClient
+from googletrans import Translator
 import random
+
 
 client = Client(api_key, api_secret)
 bot = telebot.TeleBot(token)
@@ -29,11 +30,12 @@ def weather_get():
     req = requests.get(api_weather)
     data = req.json()
 
-    translator = Translator(to_lang="Ukrainian")
+    translator = Translator()
 
     temp = str(data["list"][0]["main"]["temp"]) + "℃"
     wind = str(data["list"][0]["wind"]["speed"]) + " М/С"
-    weather = translator.translate(str(str(data["list"][0]["weather"][0]["description"])))
+    text = str(data["list"][0]["weather"][0]["description"])
+    weather = translator.translate(text, src='en', dest="uk").text
     wind_dir = int(data["list"][0]["wind"]["deg"])
     wind_direction = ""
     if wind_dir >= 337 and wind_dir <= 360 or wind_dir >= 0 and wind_dir <= 22:
@@ -70,15 +72,16 @@ def main():
     price_get()
     lines = "--------------------------------------"
     @bot.message_handler(commands=["start"])
-    def start(m, res=False):
-        bot.send_message(m.chat.id, 'Привіт! Тут буде публікуватися актуальна інформація про погоду і курси валют')
-        keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    def start(message, res=False):
+        time.sleep(1)
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_phone = types.KeyboardButton(text="Інформація")
+        button_news = types.KeyboardButton(text="Новини")
         button_film = types.KeyboardButton(text="Фільм")
-        keyboard.add(button_phone)
-        keyboard.add(button_film)
-        bot.send_message(m.chat.id,
-                         "Натисніть на кнопку!",
+        button_translate = types.KeyboardButton(text="Перекласти текст")
+        keyboard.add(button_phone, button_news, button_film, button_translate)
+        bot.send_message(message.chat.id,
+                         "Натисніть на кнопку",
                          reply_markup=keyboard)
 
     @bot.message_handler(content_types=["text"])
@@ -86,6 +89,14 @@ def main():
         if m.text == "Інформація":
             message = f"{lines}\n{weather_get()}\n{lines}\n{price_get()}\n{lines}"
             bot.send_message(m.chat.id, message)
+        elif m.text == "Перекласти текст":
+            keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+            keyboard.add("uk>en", "en>uk", "Назад")
+            msg = bot.send_message(m.chat.id, 'Виберіть мову', reply_markup=keyboard)
+            bot.register_next_step_handler(msg, process_translation)
+        elif m.text == "Новини":
+            msg = bot.send_message(m.chat.id, 'Введіть тему для новини')
+            bot.register_next_step_handler(msg, process_news)
         elif m.text == "Фільм":
             i = 0
             while i == 0:
@@ -120,18 +131,59 @@ def main():
                 price = str(round(float(client.get_avg_price(symbol=crypto_ticker)["price"]), 2)) + "$"
                 bot.send_message(m.chat.id, f"{crypto_ticker}:\n{price}")
             except Exception as ex:
-                try:
-                    api_news = NewsApiClient(api_key='5e7365280b4c447c987243e890f80410')
-                    bbc = api_news.get_everything(q=m.text,
-                                                  language="ru",
-                                                  sort_by='relevancy')
-                    for k in range(0, 4):
-                        url = bbc["articles"][k]["url"]
-                        bot.send_message(m.chat.id, f"{url}")
-                except Exception as ex:
-                    bot.send_message(m.chat.id, "Результатів не знайдено")
+                pass
 
+    def process_news(message):
+        try:
+            api_news = NewsApiClient(api_key='5e7365280b4c447c987243e890f80410')
+            bbc = api_news.get_everything(q=message.text,
+                                          language="ru",
+                                          sort_by='relevancy')
+            for k in range(0, 4):
+                url = bbc["articles"][k]["url"]
+                bot.send_message(message.chat.id, f"{url}")
+        except Exception as ex:
+            print(ex)
+            bot.send_message(message.chat.id, 'Результатів не знайдено')
 
+    def process_translation(message):
+        try:
+            if message.text == "uk>en":
+                msg = bot.send_message(message.chat.id, 'Виберіть текст, який бажаєте перекласти')
+                bot.register_next_step_handler(msg, translate_to_en)
+                bot.register_next_step_handler(msg, start)
+            elif message.text == "en>uk":
+                msg = bot.send_message(message.chat.id, 'Виберіть текст, який бажаєте перекласти')
+                bot.register_next_step_handler(msg, translate_to_uk)
+                bot.register_next_step_handler(msg, start)
+            elif message.text == "Назад":
+                keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                button_phone = types.KeyboardButton(text="Інформація")
+                button_news = types.KeyboardButton(text="Новини")
+                button_film = types.KeyboardButton(text="Фільм")
+                button_translate = types.KeyboardButton(text="Перекласти текст")
+                keyboard.add(button_phone, button_news, button_film, button_translate)
+                bot.send_message(message.chat.id,
+                                 "Натисніть на кнопку",
+                                 reply_markup=keyboard)
+        except Exception as ex:
+            print(ex)
+            bot.send_message(message.chat.id, 'Помилка!')
+
+    def translate_to_en(message):
+        try:
+            translator = Translator()
+            translation = translator.translate(message.text, dest='en')
+            bot.reply_to(message, translation.text)
+        except Exception as ex:
+            print(ex)
+    def translate_to_uk(message):
+        try:
+            translator = Translator()
+            translation = translator.translate(message.text, dest='uk')
+            bot.reply_to(message, translation.text)
+        except Exception as ex:
+            print(ex)
     bot.polling(none_stop=True, interval=0)
 
 if __name__ == '__main__':
