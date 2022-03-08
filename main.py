@@ -68,7 +68,7 @@ def price_get():
 
 def film_send(m):
     i = 0
-    while i == 0:
+    while i <= m.text:
         try:
             film_info = get_film()
             if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6:
@@ -125,6 +125,8 @@ def main():
             msg = bot.send_message(m.chat.id, 'Введіть тему для новини')
             bot.register_next_step_handler(msg, process_news)
         elif m.text == "Фільм":
+            msg = bot.send_message(m.chat.id, 'Введіть кількість фільмів')
+            bot.register_next_step_handler(msg, next_step_film)
             film_send(m)
         else:
             try:
@@ -133,6 +135,12 @@ def main():
                 bot.send_message(m.chat.id, f"{crypto_ticker}:\n{price}")
             except Exception as ex:
                 pass
+
+    def next_step_film(message):
+        try:
+            film_send(message)
+        except Exception as ex:
+            pass
 
     def process_news(message):
         try:
