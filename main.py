@@ -68,7 +68,7 @@ def price_get():
 
 def film_send(m):
     i = 0
-    while i <= m.text:
+    while i < int(m.text):
         try:
             film_info = get_film()
             if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6:
@@ -127,7 +127,6 @@ def main():
         elif m.text == "Фільм":
             msg = bot.send_message(m.chat.id, 'Введіть кількість фільмів')
             bot.register_next_step_handler(msg, next_step_film)
-            film_send(m)
         else:
             try:
                 crypto_ticker = str(m.text).upper().strip() + "USDT"
