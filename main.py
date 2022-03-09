@@ -112,6 +112,7 @@ def main():
             while i < int(message.text):
                 try:
                     film_info = get_film()
+                    bot.send_message(message.chat.id, film_info)
                     if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6:
                         if film_info["ratingIMDB"] != None and film_info["ratingIMDB"] > 6:
                             if film_info["year"] > 1990:
