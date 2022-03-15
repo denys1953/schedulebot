@@ -138,8 +138,9 @@ def main():
                     schedule.run_pending()
                     time.sleep(1)
 
-            t = Thread(target=scheduler)
-            t.start()
+            scheduler()
+            # t = Thread(target=scheduler)
+            # t.start()
         except Exception as ex:
             pass
     def next_step_film(message):
