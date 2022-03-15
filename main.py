@@ -131,16 +131,16 @@ def main():
 
             def scheduler():
                 splited = str(message.text).split(":")
-                if int(splited[0])+2 >= 24:
-                    if len(str(int(splited[0])+2-24)) == 1:
+                if int(splited[0]) - 2 >= 24:
+                    if len(str(int(splited[0]) - 2 - 24)) == 1:
                         timezone = f"{'0' + str(int(splited[0])+2-24)}:{splited[1]}"
                     else:
-                        timezone = f"{str(int(splited[0]) + 2 - 24)}:{splited[1]}"
+                        timezone = f"{str(int(splited[0]) - 2 - 24)}:{splited[1]}"
                 else:
-                    if len(str(int(splited[0]) + 2)) == 1:
-                        timezone = f"{'0' + str(int(splited[0]) + 2)}:{splited[1]}"
+                    if len(str(int(splited[0]) - 2)) == 1:
+                        timezone = f"{'0' + str(int(splited[0]) - 2)}:{splited[1]}"
                     else:
-                        timezone = f"{str(int(splited[0]) + 2)}:{splited[1]}"
+                        timezone = f"{str(int(splited[0]) - 2)}:{splited[1]}"
 
                 bot.send_message(message.chat.id, timezone)
 
