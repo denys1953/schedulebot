@@ -131,16 +131,21 @@ def main():
 
             def scheduler():
                 splited = str(message.text).split(":")
-                timezone = f"{str(int(splited[0])+2)}:{splited[1]}"
+                if int(splited[0])+2 > 24:
+                    timezone = f"{str(int(splited[0])+2-24)}:{splited[1]}"
+                else:
+                    timezone = f"{str(int(splited[0]) + 2)}:{splited[1]}"
+
                 schedule.every().day.at(timezone).do(reminder)
+
+                bot.send_message(message.chat.id, timezone)
 
                 while True:
                     schedule.run_pending()
                     time.sleep(1)
 
-            scheduler()
-            # t = Thread(target=scheduler)
-            # t.start()
+            t = Thread(target=scheduler)
+            t.start()
         except Exception as ex:
             pass
     def next_step_film(message):
