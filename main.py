@@ -7,6 +7,8 @@ from keys import api_key, api_secret, token
 from binance.client import Client
 from newsapi import NewsApiClient
 from googletrans import Translator
+from threading import Thread
+import schedule
 import random
 
 client = Client(api_key, api_secret)
@@ -77,7 +79,8 @@ def main():
         button_news = types.KeyboardButton(text="Новини")
         button_film = types.KeyboardButton(text="Фільм")
         button_translate = types.KeyboardButton(text="Перекласти текст")
-        keyboard.add(button_phone, button_news, button_film, button_translate)
+        button_reminder = types.KeyboardButton(text="Нагадування")
+        keyboard.add(button_phone, button_news, button_film, button_translate, button_reminder)
         bot.send_message(message.chat.id,
                          "Натисніть на кнопку",
                          reply_markup=keyboard)
@@ -98,6 +101,9 @@ def main():
         elif m.text == "Фільм":
             msg = bot.send_message(m.chat.id, 'Введіть кількість фільмів')
             bot.register_next_step_handler(msg, next_step_film)
+        elif m.text == "Нагадування":
+            msg = bot.send_message(m.chat.id, 'Введіть текст, який ви хочете нагадати собі')
+            bot.register_next_step_handler(msg, next_step_reminder)
         else:
             try:
                 crypto_ticker = str(m.text).upper().strip() + "USDT"
@@ -106,6 +112,32 @@ def main():
             except Exception as ex:
                 pass
 
+    def next_step_reminder(message):
+        try:
+            msg = bot.send_message(message.chat.id, 'Введіть годину, о якій ви хочете отримати нагадування (формату 14:53)')
+            text_for_reminder = message.text
+            bot.register_next_step_handler(msg, next_second_step_reminder, text_for_reminder)
+        except Exception as ex:
+            pass
+
+    def next_second_step_reminder(message, text_for_reminder):
+        try:
+            bot.send_message(message.chat.id, "Нагадування створене!")
+            def reminder():
+                bot.send_message(message.chat.id, text_for_reminder)
+                return schedule.CancelJob
+
+            def scheduler():
+                schedule.every().day.at(message.text).do(reminder)
+
+                while True:
+                    schedule.run_pending()
+                    time.sleep(1)
+
+            t = Thread(target=scheduler)
+            t.start()
+        except Exception as ex:
+            pass
     def next_step_film(message):
         try:
             i = 0
