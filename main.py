@@ -90,8 +90,7 @@ def main():
     @bot.message_handler(content_types=["text"])
     def text(m):
         if m.text == "Інформація":
-            datetime_object = datetime.datetime.now()
-            message = f"{lines}\n{weather_get()}\n{lines}\n{price_get()}\n{datetime_object.hour}{lines}"
+            message = f"{lines}\n{weather_get()}\n{lines}\n{price_get()}\n{lines}"
             bot.send_message(m.chat.id, message)
         elif m.text == "Перекласти текст":
             keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
@@ -131,7 +130,9 @@ def main():
                 return schedule.CancelJob
 
             def scheduler():
-                schedule.every().day.at(message.text).do(reminder)
+                splited = str(message.text).split(":")
+                timezone = f"{str(int(splited[0])+2)}:{splited[1]}"
+                schedule.every().day.at(timezone).do(reminder)
 
                 while True:
                     schedule.run_pending()
