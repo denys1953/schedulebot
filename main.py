@@ -136,9 +136,9 @@ def main():
                 else:
                     timezone = f"{str(int(splited[0]) + 2)}:{splited[1]}"
 
-                schedule.every().day.at(timezone).do(reminder)
-
                 bot.send_message(message.chat.id, timezone)
+
+                schedule.every().day.at(timezone).do(reminder)
 
                 while True:
                     schedule.run_pending()
@@ -147,7 +147,7 @@ def main():
             t = Thread(target=scheduler)
             t.start()
         except Exception as ex:
-            pass
+            bot.send_message(message.chat.id, ex)
     def next_step_film(message):
         try:
             i = 0
