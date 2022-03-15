@@ -8,11 +8,13 @@ from binance.client import Client
 from newsapi import NewsApiClient
 from googletrans import Translator
 from threading import Thread
+import datetime
 import schedule
 import random
 
 client = Client(api_key, api_secret)
 bot = telebot.TeleBot(token)
+
 
 headers = {
     'X-API-KEY': '9ea3a5fa-bb7d-4f8d-8dc0-5ca352b4931a',
@@ -88,7 +90,8 @@ def main():
     @bot.message_handler(content_types=["text"])
     def text(m):
         if m.text == "Інформація":
-            message = f"{lines}\n{weather_get()}\n{lines}\n{price_get()}\n{lines}"
+            datetime_object = datetime.datetime.now()
+            message = f"{lines}\n{weather_get()}\n{lines}\n{price_get()}\n{datetime_object.hour}{lines}"
             bot.send_message(m.chat.id, message)
         elif m.text == "Перекласти текст":
             keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
