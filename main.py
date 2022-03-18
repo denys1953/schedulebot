@@ -181,6 +181,7 @@ def main():
                                     description = film_info["description"]
                                     main_message_film = f"Фільм: {nameRu}\n\nРік: {year}\nРейтинг: КП - {rating_kinopoisk} | IMDB - {rating_imdb}\nКраїна: {country}\nЖанр: {genre}\nЧас: {film_length}\nОпис: {description}\n{image_film}"
                                     bot.send_message(message.chat.id, main_message_film)
+                                    i += 1
 
             except Exception as ex:
                 print(ex)
@@ -188,7 +189,6 @@ def main():
             i = 0
             while i < int(message.text):
                 ffff()
-                i += 1
         except Exception as ex:
             pass
 
