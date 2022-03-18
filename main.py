@@ -156,12 +156,8 @@ def main():
         try:
             i = 0
             while i < int(message.text):
-                film = get_film_final()
-                if film == 0:
-                    continue
-                else:
-                    bot.send_message(message.chat.id, get_film_final())
-                    i += 1
+                bot.send_message(message.chat.id, get_film_final())
+                i += 1
         except Exception as ex:
             print(ex)
 
@@ -190,7 +186,7 @@ def main():
                             for l in range(0, len(film_info["genres"])):
                                 genres.append(film_info["genres"][l]["genre"])
                             if "документальный" in genres or "короткометражка" in genres:
-                                return 0
+                                get_film_final()
                             else:
                                 image_film = film_info["posterUrl"]
                                 nameRu = film_info["nameRu"]
