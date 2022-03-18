@@ -156,12 +156,8 @@ def main():
         try:
             i = 0
             while i < int(message.text):
-                film = get_film_final()
-                if film == None:
-                    film = get_film_final()
-                else:
-                    bot.send_message(message.chat.id, film)
-                    i += 1
+                get_film_final(message)
+                i += 1
         except Exception as ex:
             print(ex)
 
@@ -177,7 +173,7 @@ def main():
         except Exception as ex:
             print(ex)
             bot.send_message(message.chat.id, 'Результатів не знайдено')
-    def get_film_final():
+    def get_film_final(message):
         try:
             film_info = get_film()
 
@@ -202,7 +198,7 @@ def main():
                                 country = film_info["countries"][0]["country"]
                                 description = film_info["description"]
                                 main_message_film = f"Фільм: {nameRu}\n\nРік: {year}\nРейтинг: КП - {rating_kinopoisk} | IMDB - {rating_imdb}\nКраїна: {country}\nЖанр: {genre}\nЧас: {film_length}\nОпис: {description}\n{image_film}"
-                                return main_message_film
+                                bot.send_message(message.chat.id, main_message_film)
         except Exception as ex:
             print(ex)
     def process_translation(message):
