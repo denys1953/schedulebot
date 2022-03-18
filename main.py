@@ -156,34 +156,39 @@ def main():
         try:
             i = 0
             while i < int(message.text):
-                try:
-                    film_info = get_film()
+                def ffff():
+                    global i
+                    try:
+                        film_info = get_film()
 
-                    if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6.5:
-                        if film_info["ratingImdb"] != None and film_info["ratingImdb"] > 6.5:
-                            if film_info["year"] > 1990:
-                                if film_info["serial"] == False and film_info["shortFilm"] == False and film_info["has3D"] == False:
-                                    genres = []
+                        if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6.5:
+                            if film_info["ratingImdb"] != None and film_info["ratingImdb"] > 6.5:
+                                if film_info["year"] > 1990:
+                                    if film_info["serial"] == False and film_info["shortFilm"] == False and film_info[
+                                        "has3D"] == False:
+                                        genres = []
 
-                                    for l in range(0, len(film_info["genres"])):
-                                        genres.append(film_info["genres"][l]["genre"])
-                                    if "документальный" in genres or "короткометражка" in genres:
-                                        continue
-                                    else:
-                                        image_film = film_info["posterUrl"]
-                                        nameRu = film_info["nameRu"]
-                                        rating_kinopoisk = film_info["ratingKinopoisk"]
-                                        rating_imdb = film_info["ratingImdb"]
-                                        year = film_info["year"]
-                                        genre = ",  ".join(genres)
-                                        film_length = str(film_info["filmLength"]) + " хвилин"
-                                        country = film_info["countries"][0]["country"]
-                                        description = film_info["description"]
-                                        main_message_film = f"Фільм: {nameRu}\n\nРік: {year}\nРейтинг: КП - {rating_kinopoisk} | IMDB - {rating_imdb}\nКраїна: {country}\nЖанр: {genre}\nЧас: {film_length}\nОпис: {description}\n{image_film}"
-                                        bot.send_message(message.chat.id, main_message_film)
-                                        i += 1
-                except Exception as ex:
-                    print(ex)
+                                        for l in range(0, len(film_info["genres"])):
+                                            genres.append(film_info["genres"][l]["genre"])
+                                        if "документальный" in genres or "короткометражка" in genres:
+                                            continue
+                                        else:
+                                            image_film = film_info["posterUrl"]
+                                            nameRu = film_info["nameRu"]
+                                            rating_kinopoisk = film_info["ratingKinopoisk"]
+                                            rating_imdb = film_info["ratingImdb"]
+                                            year = film_info["year"]
+                                            genre = ",  ".join(genres)
+                                            film_length = str(film_info["filmLength"]) + " хвилин"
+                                            country = film_info["countries"][0]["country"]
+                                            description = film_info["description"]
+                                            main_message_film = f"Фільм: {nameRu}\n\nРік: {year}\nРейтинг: КП - {rating_kinopoisk} | IMDB - {rating_imdb}\nКраїна: {country}\nЖанр: {genre}\nЧас: {film_length}\nОпис: {description}\n{image_film}"
+                                            bot.send_message(message.chat.id, main_message_film)
+                                            i += 1
+                    except Exception as ex:
+                        print(ex)
+
+                ffff()
         except Exception as ex:
             pass
 
