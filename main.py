@@ -188,7 +188,7 @@ def main():
         try:
             def final_film():
                 i = 0
-                while i < int(message.text):
+                while i == 0:
                     film = ffff()
                     if film == 1:
                         i += 1
@@ -198,7 +198,6 @@ def main():
             for i in range(int(message.text)):
                 th = Thread(target=final_film)
                 th.start()
-                time.sleep(1)
         except Exception as ex:
             pass
 
