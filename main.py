@@ -186,18 +186,17 @@ def main():
             except Exception as ex:
                 print(ex)
         try:
-            # def final_film():
-            #     i = 0
-            #     while i < int(message.text):
-            #         film = ffff()
-            #         if film == 1:
-            #             i += 1
-            #         else:
-            #             continue
+            def final_film():
+                i = 0
+                while i < int(message.text):
+                    film = ffff()
+                    if film == 1:
+                        i += 1
+                    else:
+                        continue
 
-            # final_film()
             for i in range(int(message.text)):
-                th = Thread(target=ffff)
+                th = Thread(target=final_film)
                 th.start()
                 time.sleep(1)
         except Exception as ex:
