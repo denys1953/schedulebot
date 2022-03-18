@@ -163,7 +163,7 @@ def main():
                     bot.send_message(message.chat.id, get_film_final())
                     i += 1
         except Exception as ex:
-            pass
+            print(ex)
 
     def process_news(message):
         try:
