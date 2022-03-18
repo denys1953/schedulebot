@@ -142,8 +142,6 @@ def main():
                     else:
                         timezone = f"{str(int(splited[0]) - 2)}:{splited[1]}"
 
-                print(timezone)
-
                 schedule.every().day.at(timezone).do(reminder)
 
                 while True:
@@ -153,39 +151,17 @@ def main():
             t = Thread(target=scheduler)
             t.start()
         except Exception as ex:
-            bot.send_message(message.chat.id, ex)
+            pass
     def next_step_film(message):
         try:
             i = 0
             while i < int(message.text):
-                try:
-                    film_info = get_film()
-
-                    if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6.5:
-                        if film_info["ratingImdb"] != None and film_info["ratingImdb"] > 6.5:
-                            if film_info["year"] > 1990:
-                                if film_info["serial"] == False and film_info["shortFilm"] == False and film_info["has3D"] == False:
-                                    genres = []
-
-                                    for l in range(0, len(film_info["genres"])):
-                                        genres.append(film_info["genres"][l]["genre"])
-                                    if "документальный" in genres or "короткометражка" in genres:
-                                        continue
-                                    else:
-                                        image_film = film_info["posterUrl"]
-                                        nameRu = film_info["nameRu"]
-                                        rating_kinopoisk = film_info["ratingKinopoisk"]
-                                        rating_imdb = film_info["ratingImdb"]
-                                        year = film_info["year"]
-                                        genre = ",  ".join(genres)
-                                        film_length = str(film_info["filmLength"]) + " хвилин"
-                                        country = film_info["countries"][0]["country"]
-                                        description = film_info["description"]
-                                        main_message_film = f"Фільм: {nameRu}\n\nРік: {year}\nРейтинг: КП - {rating_kinopoisk} | IMDB - {rating_imdb}\nКраїна: {country}\nЖанр: {genre}\nЧас: {film_length}\nОпис: {description}\n{image_film}"
-                                        bot.send_message(message.chat.id, main_message_film)
-                                        i += 1
-                except Exception as ex:
-                    print(ex)
+                film = get_film_final()
+                if film == 0:
+                    continue
+                else:
+                    bot.send_message(message.chat.id, get_film_final())
+                    i += 1
         except Exception as ex:
             pass
 
@@ -201,7 +177,34 @@ def main():
         except Exception as ex:
             print(ex)
             bot.send_message(message.chat.id, 'Результатів не знайдено')
+    def get_film_final():
+        try:
+            film_info = get_film()
 
+            if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6.5:
+                if film_info["ratingImdb"] != None and film_info["ratingImdb"] > 6.5:
+                    if film_info["year"] > 1990:
+                        if film_info["serial"] == False and film_info["shortFilm"] == False and film_info["has3D"] == False:
+                            genres = []
+
+                            for l in range(0, len(film_info["genres"])):
+                                genres.append(film_info["genres"][l]["genre"])
+                            if "документальный" in genres or "короткометражка" in genres:
+                                return 0
+                            else:
+                                image_film = film_info["posterUrl"]
+                                nameRu = film_info["nameRu"]
+                                rating_kinopoisk = film_info["ratingKinopoisk"]
+                                rating_imdb = film_info["ratingImdb"]
+                                year = film_info["year"]
+                                genre = ",  ".join(genres)
+                                film_length = str(film_info["filmLength"]) + " хвилин"
+                                country = film_info["countries"][0]["country"]
+                                description = film_info["description"]
+                                main_message_film = f"Фільм: {nameRu}\n\nРік: {year}\nРейтинг: КП - {rating_kinopoisk} | IMDB - {rating_imdb}\nКраїна: {country}\nЖанр: {genre}\nЧас: {film_length}\nОпис: {description}\n{image_film}"
+                                return main_message_film
+        except Exception as ex:
+            print(ex)
     def process_translation(message):
         try:
             if message.text == "uk>en":
