@@ -157,9 +157,11 @@ def main():
             i = 0
             while i < int(message.text):
                 film = get_film_final()
-                print(film)
-                bot.send_message(message.chat.id, film)
-                i += 1
+                if film == None:
+                    film = get_film_final()
+                else:
+                    bot.send_message(message.chat.id, film)
+                    i += 1
         except Exception as ex:
             print(ex)
 
