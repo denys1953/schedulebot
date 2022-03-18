@@ -156,7 +156,9 @@ def main():
         try:
             i = 0
             while i < int(message.text):
-                bot.send_message(message.chat.id, get_film_final())
+                film = get_film_final()
+                print(film)
+                bot.send_message(message.chat.id, film)
                 i += 1
         except Exception as ex:
             print(ex)
