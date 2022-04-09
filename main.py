@@ -131,16 +131,16 @@ def main():
 
             def scheduler():
                 splited = str(message.text).split(":")
-                if int(splited[0]) - 1 < 0:
-                    if len(str(abs(int(splited[0]) - 1 - 24))) == 1:
+                if int(splited[0]) - 3 < 0:
+                    if len(str(abs(int(splited[0]) - 3 - 24))) == 1:
                         timezone = f"{'0' + str(abs(int(splited[0]) - 24))}:{splited[1]}"
                     else:
                         timezone = f"{str(abs(int(splited[0]) - 24))}:{splited[1]}"
                 else:
-                    if len(str(int(splited[0]) - 1)) == 1:
-                        timezone = f"{'0' + str(int(splited[0]) - 1)}:{splited[1]}"
+                    if len(str(int(splited[0]) - 3)) == 1:
+                        timezone = f"{'0' + str(int(splited[0]) - 3)}:{splited[1]}"
                     else:
-                        timezone = f"{str(int(splited[0]) - 1)}:{splited[1]}"
+                        timezone = f"{str(int(splited[0]) - 3)}:{splited[1]}"
 
                 schedule.every().day.at(timezone).do(reminder)
 
