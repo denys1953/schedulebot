@@ -82,7 +82,9 @@ def main():
         button_film = types.KeyboardButton(text="Фільм")
         button_translate = types.KeyboardButton(text="Перекласти текст")
         button_reminder = types.KeyboardButton(text="Нагадування")
-        keyboard.add(button_phone, button_news, button_film, button_translate, button_reminder)
+        button_code = types.KeyboardButton(text="Зашифрувати")
+        button_decode = types.KeyboardButton(text="Розшифрувати")
+        keyboard.add(button_phone, button_news, button_film, button_translate, button_reminder, button_code, button_decode)
         bot.send_message(message.chat.id,
                          "Натисніть на кнопку",
                          reply_markup=keyboard)
@@ -106,6 +108,12 @@ def main():
         elif m.text == "Нагадування":
             msg = bot.send_message(m.chat.id, 'Введіть текст, який ви хочете нагадати собі')
             bot.register_next_step_handler(msg, next_step_reminder)
+        elif m.text == "Зашифрувати":
+            msg = bot.send_message(m.chat.id, 'Введіть текст, який ви хочете зашифрувати')
+            bot.register_next_step_handler(msg, func)
+        elif m.text == "Розшифрувати":
+            msg = bot.send_message(m.chat.id, 'Введіть текст, який ви хочете розшифрувати')
+            bot.register_next_step_handler(msg, re_func)
         else:
             try:
                 crypto_ticker = str(m.text).upper().strip() + "USDT"
@@ -113,6 +121,67 @@ def main():
                 bot.send_message(m.chat.id, f"{crypto_ticker}:\n{price}")
             except Exception as ex:
                 pass
+
+
+    def completed_key(text, keyword):
+        new_key = ''
+        text = text.lower()
+        for i in range(len(text)):
+            if text[i] != " ":
+                for j in range(len(keyword)):
+                    if len(new_key) < len(text):
+                        new_key += keyword[j]
+            else:
+                new_key += " "
+        return new_key
+
+    def func(message):
+        message.text = message.text.lower()
+        alphabet = "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя "
+        text_num, key_num, sum = [], [], []
+        result = ""
+
+        for i in range(len(message.text)):
+            text_num.append(alphabet.index(message.text[i]))
+            key_num.append(alphabet.index(completed_key(message.text, "мінор")[i]))
+
+        for i in range(len(message.text)):
+            if text_num[i] == 33:
+                sum.append(33)
+                continue
+            elif text_num[i] + key_num[i] > 32:
+                sum.append((text_num[i] + key_num[i]) - 33)
+            else:
+                sum.append(text_num[i] + key_num[i])
+
+        for i in sum:
+            result += alphabet[i]
+
+        bot.send_message(message.chat.id, result)
+
+    def re_func(message):
+        message.text = message.text.lower()
+        alphabet = "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя "
+        text_num, key_num, sum = [], [], []
+        result = ""
+
+        for i in range(len(message.text)):
+            text_num.append(alphabet.index(message.text[i]))
+            key_num.append(alphabet.index(completed_key(message.text, "мінор")[i]))
+
+        for i in range(len(message.text)):
+            if text_num[i] == 33:
+                sum.append(33)
+                continue
+            elif text_num[i] < key_num[i]:
+                sum.append((text_num[i] + 33 - key_num[i]))
+            else:
+                sum.append(text_num[i] - key_num[i])
+
+        for i in sum:
+            result += alphabet[i]
+
+        bot.send_message(message.chat.id, result)
 
     def next_step_reminder(message):
         try:
