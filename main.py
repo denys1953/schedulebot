@@ -9,6 +9,7 @@ from newsapi import NewsApiClient
 from googletrans import Translator
 from threading import Thread
 import datetime
+import pyshorteners
 import schedule
 import random
 
@@ -82,9 +83,10 @@ def main():
         button_film = types.KeyboardButton(text="Фільм")
         button_translate = types.KeyboardButton(text="Перекласти текст")
         button_reminder = types.KeyboardButton(text="Нагадування")
+        button_short_url = types.KeyboardButton(text="Скоротити посилання")
         button_code = types.KeyboardButton(text="Зашифрувати")
         button_decode = types.KeyboardButton(text="Розшифрувати")
-        keyboard.add(button_phone, button_news, button_film, button_translate, button_reminder, button_code, button_decode)
+        keyboard.add(button_phone, button_news, button_film, button_translate, button_reminder, button_short_url, button_code, button_decode)
         bot.send_message(message.chat.id,
                          "Натисніть на кнопку",
                          reply_markup=keyboard)
@@ -114,6 +116,9 @@ def main():
         elif m.text == "Розшифрувати":
             msg = bot.send_message(m.chat.id, 'Введіть текст, який ви хочете розшифрувати')
             bot.register_next_step_handler(msg, re_func)
+        elif m.text == "Скоротити посилання":
+            msg = bot.send_message(m.chat.id, 'Введіть посилання, яке ви хочете скоротити')
+            bot.register_next_step_handler(msg, short_url)
         else:
             try:
                 crypto_ticker = str(m.text).upper().strip() + "USDT"
@@ -122,6 +127,11 @@ def main():
             except Exception as ex:
                 pass
 
+    def short_url(message):
+        try:
+            bot.send_message(message.chat.id, pyshorteners.Shortener().tinyurl.short(message.text))
+        except Exception as ex:
+            bot.send_message(message.chat.id, "Посилання неправильного формату")
 
     def completed_key(text, keyword):
         new_key = ''
