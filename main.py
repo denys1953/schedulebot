@@ -29,7 +29,7 @@ def get_film():
     return json.loads(req.text)
 
 def weather_get():
-    api_weather = "http://api.openweathermap.org/data/2.5/find?q=Sambir&type=like&appid=8622086cf3b22b20f915416a1fe01145&units=metric"
+    api_weather = "http://api.openweathermap.org/data/2.5/find?q=Lviv&type=like&appid=8622086cf3b22b20f915416a1fe01145&units=metric"
 
     req = requests.get(api_weather)
     data = req.json()
@@ -58,7 +58,7 @@ def weather_get():
         wind_direction = "ЗХ"
     elif wind_dir > 292 and wind_dir < 337:
         wind_direction = "ПН/ЗХ"
-    string = f"Місто: Самбір\nТемпература: {temp}\nПогода: {weather}\nНапрямок вітру: {wind_direction}\nШвилкість вітру: {wind}"
+    string = f"Місто: Львів\nТемпература: {temp}\nПогода: {weather}\nНапрямок вітру: {wind_direction}\nШвилкість вітру: {wind}"
     return string
 
 def price_get():
@@ -79,14 +79,12 @@ def main():
         time.sleep(1)
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_phone = types.KeyboardButton(text="Інформація")
-        button_news = types.KeyboardButton(text="Новини")
-        button_film = types.KeyboardButton(text="Фільм")
         button_translate = types.KeyboardButton(text="Перекласти текст")
         button_reminder = types.KeyboardButton(text="Нагадування")
         button_short_url = types.KeyboardButton(text="Скоротити посилання")
         button_code = types.KeyboardButton(text="Зашифрувати")
         button_decode = types.KeyboardButton(text="Розшифрувати")
-        keyboard.add(button_phone, button_news, button_film, button_translate, button_reminder, button_short_url, button_code, button_decode)
+        keyboard.add(button_phone, button_translate, button_reminder, button_short_url, button_code, button_decode)
         bot.send_message(message.chat.id,
                          "Натисніть на кнопку",
                          reply_markup=keyboard)
@@ -101,12 +99,6 @@ def main():
             keyboard.add("uk>en", "en>uk", "Назад")
             msg = bot.send_message(m.chat.id, 'Виберіть мову', reply_markup=keyboard)
             bot.register_next_step_handler(msg, process_translation)
-        elif m.text == "Новини":
-            msg = bot.send_message(m.chat.id, 'Введіть тему для новини')
-            bot.register_next_step_handler(msg, process_news)
-        elif m.text == "Фільм":
-            msg = bot.send_message(m.chat.id, 'Введіть кількість фільмів')
-            bot.register_next_step_handler(msg, next_step_film)
         elif m.text == "Нагадування":
             msg = bot.send_message(m.chat.id, 'Введіть текст, який ви хочете нагадати собі')
             bot.register_next_step_handler(msg, next_step_reminder)
@@ -152,8 +144,12 @@ def main():
         result = ""
 
         for i in range(len(message.text)):
-            text_num.append(alphabet.index(message.text[i]))
-            key_num.append(alphabet.index(completed_key(message.text, "мінор")[i]))
+            try:
+                text_num.append(alphabet.index(message.text[i]))
+                key_num.append(alphabet.index(completed_key(message.text, "мінор")[i]))
+            except Exception as ex:
+                return
+
 
         for i in range(len(message.text)):
             if text_num[i] == 33:
@@ -199,7 +195,7 @@ def main():
             text_for_reminder = message.text
             bot.register_next_step_handler(msg, next_second_step_reminder, text_for_reminder)
         except Exception as ex:
-            pass
+            return
 
     def next_second_step_reminder(message, text_for_reminder):
         try:
@@ -210,16 +206,16 @@ def main():
 
             def scheduler():
                 splited = str(message.text).split(":")
-                if int(splited[0]) - 3 < 0:
-                    if len(str(abs(int(splited[0]) - 3 - 24))) == 1:
+                if int(splited[0]) < 0:
+                    if len(str(abs(int(splited[0]) - 24))) == 1:
                         timezone = f"{'0' + str(abs(int(splited[0]) - 24))}:{splited[1]}"
                     else:
                         timezone = f"{str(abs(int(splited[0]) - 24))}:{splited[1]}"
                 else:
-                    if len(str(int(splited[0]) - 3)) == 1:
-                        timezone = f"{'0' + str(int(splited[0]) - 3)}:{splited[1]}"
+                    if len(str(int(splited[0]))) == 1:
+                        timezone = f"{'0' + str(int(splited[0]))}:{splited[1]}"
                     else:
-                        timezone = f"{str(int(splited[0]) - 3)}:{splited[1]}"
+                        timezone = f"{str(int(splited[0]))}:{splited[1]}"
 
                 schedule.every().day.at(timezone).do(reminder)
 
@@ -231,67 +227,6 @@ def main():
             t.start()
         except Exception as ex:
             bot.send_message(message.chat.id, ex)
-    def next_step_film(message):
-        def ffff():
-            global i
-            try:
-                film_info = get_film()
-
-                if film_info["ratingKinopoisk"] != None and film_info["ratingKinopoisk"] > 6.5:
-                    if film_info["ratingImdb"] != None and film_info["ratingImdb"] > 6.5:
-                        if film_info["year"] > 1990:
-                            if film_info["serial"] == False and film_info["shortFilm"] == False and film_info[
-                                "has3D"] == False:
-                                genres = []
-
-                                for l in range(0, len(film_info["genres"])):
-                                    genres.append(film_info["genres"][l]["genre"])
-                                if "документальный" in genres or "короткометражка" in genres:
-                                    ffff()
-                                else:
-                                    image_film = film_info["posterUrl"]
-                                    nameRu = film_info["nameRu"]
-                                    rating_kinopoisk = film_info["ratingKinopoisk"]
-                                    rating_imdb = film_info["ratingImdb"]
-                                    year = film_info["year"]
-                                    genre = ",  ".join(genres)
-                                    film_length = str(film_info["filmLength"]) + " хвилин"
-                                    country = film_info["countries"][0]["country"]
-                                    description = film_info["description"]
-                                    main_message_film = f"Фільм: {nameRu}\n\nРік: {year}\nРейтинг: КП - {rating_kinopoisk} | IMDB - {rating_imdb}\nКраїна: {country}\nЖанр: {genre}\nЧас: {film_length}\nОпис: {description}\n{image_film}"
-                                    bot.send_message(message.chat.id, main_message_film)
-                                    return 1
-
-            except Exception as ex:
-                print(ex)
-        try:
-            def final_film():
-                i = 0
-                while i == 0:
-                    film = ffff()
-                    if film == 1:
-                        i += 1
-                    else:
-                        continue
-
-            for i in range(int(message.text)):
-                th = Thread(target=final_film)
-                th.start()
-        except Exception as ex:
-            pass
-
-    def process_news(message):
-        try:
-            api_news = NewsApiClient(api_key='5e7365280b4c447c987243e890f80410')
-            bbc = api_news.get_everything(q=message.text,
-                                          language="ru",
-                                          sort_by='relevancy')
-            for k in range(0, 4):
-                url = bbc["articles"][k]["url"]
-                bot.send_message(message.chat.id, f"{url}")
-        except Exception as ex:
-            print(ex)
-            bot.send_message(message.chat.id, 'Результатів не знайдено')
 
     def process_translation(message):
         try:
@@ -306,10 +241,13 @@ def main():
             elif message.text == "Назад":
                 keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
                 button_phone = types.KeyboardButton(text="Інформація")
-                button_news = types.KeyboardButton(text="Новини")
-                button_film = types.KeyboardButton(text="Фільм")
                 button_translate = types.KeyboardButton(text="Перекласти текст")
-                keyboard.add(button_phone, button_news, button_film, button_translate)
+                button_reminder = types.KeyboardButton(text="Нагадування")
+                button_short_url = types.KeyboardButton(text="Скоротити посилання")
+                button_code = types.KeyboardButton(text="Зашифрувати")
+                button_decode = types.KeyboardButton(text="Розшифрувати")
+                keyboard.add(button_phone, button_translate, button_reminder, button_short_url, button_code,
+                             button_decode)
                 bot.send_message(message.chat.id,
                                  "Натисніть на кнопку",
                                  reply_markup=keyboard)
