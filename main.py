@@ -22,11 +22,6 @@ headers = {
     'Content-Type': 'application/json',
 }
 
-def get_film():
-    id = random.randint(297, 5000000)
-    url = f"https://kinopoiskapiunofficial.tech/api/v2.2/films/{id}"
-    req = requests.get(url, headers=headers)
-    return json.loads(req.text)
 
 def weather_get():
     api_weather = "http://api.openweathermap.org/data/2.5/find?q=Lviv&type=like&appid=8622086cf3b22b20f915416a1fe01145&units=metric"
